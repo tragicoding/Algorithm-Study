@@ -1,49 +1,64 @@
 #include <iostream>
-#include <vector>
-#include <queue>
-#include <limits>
 #include <algorithm>
+#include <queue>
+#include <vector>
+#include <limits.h>
 
 using namespace std;
 
-const int INF = 1e9; //무한대 값 설정
-
-//[거리,노드]
-vector<pair<int,int>> adj [20004]; //그래프의 인접 리스트 표현
-vector<int> dist(20004,INF); //최단 거리 배열 
-
-void dijkstra(int start)
+int dijkstra(vector<vector<int>> graph)
 {
-    priority_queue<pair<int,int>
-    , vector<pair<int,int>>
-    , greater<pair<int,int>>> pq;//우선순위 큐의 선언(작은값 우선)
-    //다음 노드 선택을 위한 우선순위 큐
+    vector<int> dist(6,INT_MAX); //거리 갱신 벡터 : 모두 무한대로 초기화.(노드번호를 인덱스 번호와 맞추기 위해.)
+    priority_queue< pair<int,int>, vector<pair<int,int>> , greater<pair<int,int>> > pq; //{거리,노드}
 
-    dist[start] = 0; 
-    pq.push({0,start});//0은 거리, start는 지금의 정점
+    int start = 1; //첫번째 노드 번호
+    int destination = 5;
+    
+    dist[start] = 0;
+    pq.push(pair(0,start));
 
     while (!pq.empty())
     {
-        int here_cost = pq.top().first;//현재 거리
-        int u = pq.top().second;//현재 노드
+        int current_distance = pq.top().first;
+        int current_node = pq.top().second;
+
         pq.pop();
-        cout << "PQTOP\n";
-        cout << u << "\n";
 
-        if ( dist[u] != here_cost) continue;
-
-        for (auto there : adj[u])
+        //이미 기록된 최단 거리가 방금 꺼낸 거리보다 짧다면, 무시
+        //즉, 오래된 기록임. 
+        //한 노드까지 가는 거리가 5 였다가 나중에 3으로 갱신 되었다면,
+        //그 5도 아직 우선순위 큐에 있으므로 그 5가 등장하면 무시한다. 
+        if (current_distance > dist[current_node]) {continue;}
+        
+        for (int i = 0; i < graph.size(); i++ )
         {
-            int new_cost = here_cost + there.first;
-
-            //거리가 더 짧으면 이걸로 갱신.
-            if (new_cost < dist[there.second])
+            int from = graph[i][0];
+            int to   = graph[i][1];
+            int cost = graph[i][2];
+            
+            if (from != current_node) {continue;} // 현재 노드만 처리
+            
+            int new_distance = current_distance + cost;
+            
+            if (new_distance < dist[to]) //더 작은 놈으로 갱신
             {
-                dist[there.second] = new_cost;
-                cout << there.second << ":" << new_cost << "\n";
-                pq.push({new_cost , there.second});
+                dist[to] = new_distance;
+                pq.push(pair(new_distance,to));
             }
         }
-    }
+        
+        
+        //경로탐색이 모두 끝난뒤 최종 목적지 까지의 경로가 존재하는지 확인
+        if (dist[destination] == INT_MAX)
+        {
+            return -1;
+        }
 
+        return dist[destination];
+}
+
+int main()
+{
+
+    return 0;
 }
